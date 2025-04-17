@@ -19,10 +19,10 @@ const ChatContainer = () => {
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    if (!selectedUser?._id) return;
-
+    if (!selectedUser || !selectedUser._id) return;
+  
     getMessages(selectedUser._id);
-
+  
     // ✅ Listen for real-time incoming messages
     socket.on("newMessage", (newMsg) => {
       if (
@@ -32,12 +32,12 @@ const ChatContainer = () => {
         addMessage(newMsg);
       }
     });
-
-    // Cleanup to remove socket listener when switching chats or unmounting
+  
     return () => {
       socket.off("newMessage");
     };
-  }, [selectedUser._id, getMessages, authUser._id, selectedUser, addMessage]);
+  }, [selectedUser, selectedUser?._id, getMessages, authUser._id, addMessage]);
+  
 
   useEffect(() => {
     if (messageEndRef.current && messages.length > 0) {
