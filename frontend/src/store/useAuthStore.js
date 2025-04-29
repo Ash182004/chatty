@@ -72,7 +72,7 @@ export const useAuthStore = create((set, get) => ({
   updateProfile: async (data) => {
     set({ isUpdatingProfile: true });
     try {
-      const res = await axios.patch("http://localhost:5550/api/auth/update-profile",data,
+      const res = await axios.patch(`${BASE_URL}/api/auth/update-profile`,data,
         {
           withCredentials: true, // ⬅️ VERY IMPORTANT
         });
