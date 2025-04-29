@@ -71,19 +71,16 @@ const SettingsPage = () => {
                       className={`flex ${message.isSent ? "justify-end" : "justify-start"}`}
                     >
                       <div
-                        className={`
-                          max-w-[80%] rounded-xl p-3 shadow-sm
-                          ${message.isSent ? "bg-primary text-primary-content" : "bg-base-200"}
-                        `}
+                        className={`max-w-[80%] rounded-xl p-3 shadow-sm
+                          ${message.isSent ? "bg-primary text-primary-content" : "bg-base-200"}`}
                       >
                         <p className="text-sm">{message.content}</p>
                         <p
-                          className={`
-                            text-[10px] mt-1.5
-                            ${message.isSent ? "text-primary-content/70" : "text-base-content/70"}
-                          `}
+                          className={`text-[10px] mt-1.5
+                            ${message.isSent ? "text-primary-content/70" : "text-base-content/70"}`}
                         >
-                          12:00 PM
+                          {/* Dynamically show timestamp or use fixed time */}
+                          {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </p>
                       </div>
                     </div>
@@ -98,7 +95,7 @@ const SettingsPage = () => {
                       className="input input-bordered flex-1 text-sm h-10"
                       placeholder="Type a message..."
                       value="This is a preview"
-                      readOnly
+                      disabled // make it disabled to indicate it's a preview
                     />
                     <button className="btn btn-primary h-10 min-h-0">
                       <Send size={18} />

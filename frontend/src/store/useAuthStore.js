@@ -2,8 +2,10 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import axios from "axios";
 
-const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5001" : "/";
+
+const BASE_URL = import.meta.env.MODE === "development" ? "http://localhost:5550" : "/";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -35,7 +37,7 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Account created successfully");
       get().connectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "An error occurred");
     } finally {
       set({ isSigningUp: false });
     }
@@ -49,7 +51,7 @@ export const useAuthStore = create((set, get) => ({
       toast.success("Logged in successfully");
       get().connectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "An error occurred");
     } finally {
       set({ isLoggingIn: false });
     }
@@ -60,21 +62,25 @@ export const useAuthStore = create((set, get) => ({
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully");
-      get().disconnectSocket();
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Logout failed");
+    } finally {
+      get().disconnectSocket(); // Ensure cleanup happens
     }
   },
 
   updateProfile: async (data) => {
     set({ isUpdatingProfile: true });
     try {
-      const res = await axiosInstance.put("/auth/update-profile", data);
+      const res = await axios.patch("http://localhost:5550/api/auth/update-profile",data,
+        {
+          withCredentials: true, // ⬅️ VERY IMPORTANT
+        });
       set({ authUser: res.data });
       toast.success("Profile updated successfully");
     } catch (error) {
       console.log("Error in update profile:", error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "An error occurred");
     } finally {
       set({ isUpdatingProfile: false });
     }
@@ -93,6 +99,10 @@ export const useAuthStore = create((set, get) => ({
 
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
+    });
+
+    socket.on('disconnect', () => {
+      set({ socket: null });
     });
   },
 

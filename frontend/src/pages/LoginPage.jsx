@@ -11,14 +11,26 @@ const LoginPage = () => {
     password: "",
   });
   const { login, isLoggingIn } = useAuthStore();
+  const [error, setError] = useState(""); // State to hold error messages
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    login(formData);
+
+    // Basic validation for empty fields
+    if (!formData.email || !formData.password) {
+      alert("Please fill in both email and password fields.");
+      return;
+    }
+
+    try {
+      await login(formData);
+    } catch (err) {
+      setError("Login failed. Please check your credentials.");
+    }
   };
 
   return (
-    <div className="h-screen grid lg:grid-cols-2">
+    <div className="h-screen grid lg:grid-cols-2 grid-cols-1">
       {/* Left Side - Form */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
@@ -85,6 +97,9 @@ const LoginPage = () => {
               </div>
             </div>
 
+            {/* Error Message */}
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+
             <button type="submit" className="btn btn-primary w-full" disabled={isLoggingIn}>
               {isLoggingIn ? (
                 <>
@@ -116,4 +131,5 @@ const LoginPage = () => {
     </div>
   );
 };
+
 export default LoginPage;

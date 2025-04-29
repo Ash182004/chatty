@@ -27,15 +27,16 @@ app.use(
   })
 );
 
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
+// Production static file handling
 if (process.env.NODE_ENV === "production") {
-  // app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  // app.get("/*", (req, res) => {
-  //   res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-  // });
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
+  app.get("/*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+  });
 }
 
 // 🛠 Connect DB and THEN start server
@@ -48,3 +49,9 @@ connectDB()
   .catch((err) => {
     console.error("❌ Failed to connect to MongoDB:", err);
   });
+
+// Handle unhandled promise rejections
+process.on("unhandledRejection", (err) => {
+  console.error("Unhandled Rejection:", err.message);
+  server.close(() => process.exit(1)); // Gracefully shutdown the server
+});
